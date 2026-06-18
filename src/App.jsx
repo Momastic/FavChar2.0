@@ -57,7 +57,7 @@ const seedCharacters = [
     id: 'c1', listId: 'list_bluelock', groupId: 'grp_japon',
     name: 'Yoichi Isagi',
     description: 'Delantero que piensa el campo como un tablero: siempre busca el espacio que nadie más ve.',
-    height: '177 cm', weight: '64 kg',
+    height: '177 cm', age: '18 años',
     nicknames: ['El Devorador de Campo'],
     styles: ['Uniforme de entrenamiento del equipo Japón U-20', 'Chaqueta azul de la selección'],
     profileImage: null, styleImages: [], favorite: false,
@@ -67,7 +67,7 @@ const seedCharacters = [
     id: 'c2', listId: 'list_bluelock', groupId: 'grp_japon',
     name: 'Shoei Barou',
     description: 'Delantero de fuerza física dominante; juega para imponerse como único protagonista del ataque.',
-    height: '190 cm', weight: '85 kg',
+    height: '190 cm', age: '19 años',
     nicknames: ['El Rey'],
     styles: ['Uniforme suelto de entrenamiento', 'Chamarra de cuero personal'],
     profileImage: null, styleImages: [], favorite: false,
@@ -77,7 +77,7 @@ const seedCharacters = [
     id: 'c3', listId: 'list_bluelock', groupId: 'grp_japon',
     name: 'Ryusei Shidou',
     description: 'Extremo de gran velocidad, conocido por su estilo de juego instintivo y errático.',
-    height: '181 cm', weight: '70 kg',
+    height: '181 cm', age: '18 años',
     nicknames: ['El Genio Loco'],
     styles: ['Uniforme de la selección U-20', 'Ropa urbana extravagante'],
     profileImage: null, styleImages: [], favorite: false,
@@ -87,7 +87,7 @@ const seedCharacters = [
     id: 'c4', listId: 'list_bluelock', groupId: 'grp_japon',
     name: 'Rensuke Karasu',
     description: 'Delantero técnico especializado en jugadas de un toque y pases milimétricos.',
-    height: '178 cm', weight: '64 kg',
+    height: '178 cm', age: '18 años',
     nicknames: [],
     styles: ['Uniforme de entrenamiento'],
     profileImage: null, styleImages: [], favorite: false,
@@ -97,7 +97,7 @@ const seedCharacters = [
     id: 'c5', listId: 'list_bluelock', groupId: 'grp_munchen',
     name: 'Michael Kaiser',
     description: 'Delantero estrella de fama mundial, conocido por su carisma y su disparo característico.',
-    height: '188 cm', weight: '81 kg',
+    height: '188 cm', age: '20 años',
     nicknames: ['El Emperador'],
     styles: ['Uniforme titular del Bastard München', 'Vestimenta de gala para entrevistas'],
     profileImage: null, styleImages: [], favorite: false,
@@ -389,7 +389,7 @@ function CharacterFormModal({ title, initial, groups, fixedGroupId, onSave, onCl
   const [groupId, setGroupId] = useState(initial?.groupId || fixedGroupId || (groups[0] ? groups[0].id : ''));
   const [description, setDescription] = useState(initial?.description || '');
   const [height, setHeight] = useState(initial?.height || '');
-  const [weight, setWeight] = useState(initial?.weight || '');
+  const [age, setAge] = useState(initial?.age || '');
   const [nicknames, setNicknames] = useState((initial?.nicknames || []).join(', '));
   const [styles, setStyles] = useState((initial?.styles || []).join('\n'));
   const [profileImage, setProfileImage] = useState(initial?.profileImage || null);
@@ -423,7 +423,7 @@ function CharacterFormModal({ title, initial, groups, fixedGroupId, onSave, onCl
       groupId: fixedGroupId || groupId,
       description: description.trim(),
       height: height.trim(),
-      weight: weight.trim(),
+      age: age.trim(),
       nicknames: nicknames.split(',').map((s) => s.trim()).filter(Boolean),
       styles: styles.split('\n').map((s) => s.trim()).filter(Boolean),
       profileImage,
@@ -476,8 +476,8 @@ function CharacterFormModal({ title, initial, groups, fixedGroupId, onSave, onCl
                 <input className="fc-input" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="Ej: 177 cm" />
               </div>
               <div>
-                <label className="fc-label">Peso</label>
-                <input className="fc-input" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="Ej: 64 kg" />
+                <label className="fc-label">Edad</label>
+                <input className="fc-input" value={age} onChange={(e) => setAge(e.target.value)} placeholder="Ej: 18 años" />
               </div>
             </div>
 
@@ -559,7 +559,7 @@ function CharacterDetailModal({ character, listName, groupName, onClose, onEdit,
 
           <div className="grid grid-cols-2 gap-3" style={{ marginBottom: '0.75rem' }}>
             <InfoField label="Estatura" value={character.height || '—'} />
-            <InfoField label="Peso" value={character.weight || '—'} />
+            <InfoField label="Edad" value={character.age || '—'} />
           </div>
 
           {character.nicknames && character.nicknames.length > 0 && (

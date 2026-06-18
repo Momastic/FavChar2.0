@@ -316,6 +316,72 @@ function ConfirmModal({ title, message, confirmLabel = 'Eliminar', onConfirm, on
 }
 
 // ---------------------------------------------------------------------------
+// Modal para crear lista con imagen
+// ---------------------------------------------------------------------------
+function AddListModal({ onSave, onClose }) {
+  const [name, setName] = useState('');
+  const [image, setImage] = useState(null);
+  const [error, setError] = useState('');
+
+  async function handleImageFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file, 500, 0.85);
+    setImage(dataUrl);
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) { setError('El nombre es obligatorio.'); return; }
+    onSave(name.trim(), image);
+  }
+
+  return (
+    <ModalShell title="Nuevo archivo" onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label className="fc-label">Nombre del archivo *</label>
+          <input
+            autoFocus
+            className="fc-input"
+            value={name}
+            onChange={(e) => { setName(e.target.value); setError(''); }}
+            placeholder="Ej: Blue Lock, Attack on Titan"
+          />
+        </div>
+
+        <div style={{ marginTop: '1rem' }}>
+          <label className="fc-label">Imagen (opcional - logo, portada, etc.)</label>
+          <label className="btn btn-ghost" style={{ fontSize: '0.68rem', cursor: 'pointer', marginTop: '0.3rem' }}>
+            <ImagePlus size={13} /> Seleccionar imagen
+            <input type="file" accept="image/*" className="hidden" onChange={handleImageFile} style={{ display: 'none' }} />
+          </label>
+          {image && (
+            <div style={{ marginTop: '0.5rem', position: 'relative', width: 'fit-content' }}>
+              <img src={image} alt="Preview" style={{ height: '5rem', objectFit: 'cover', borderRadius: '2px', border: '1px solid rgba(32,40,58,0.15)' }} />
+              <button
+                type="button"
+                onClick={() => setImage(null)}
+                style={{ position: 'absolute', top: '-6px', right: '-6px', width: '1.1rem', height: '1.1rem', borderRadius: '9999px', background: '#9C4A3A', color: '#FAF6EC', border: 'none', cursor: 'pointer', fontSize: '0.6rem', lineHeight: 1 }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
+
+        {error && <p className="fc-tiny" style={{ color: '#9C4A3A', marginTop: '0.75rem' }}>{error}</p>}
+
+        <div className="flex justify-end gap-2" style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(32,40,58,0.1)' }}>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary">Crear archivo</button>
+        </div>
+      </form>
+    </ModalShell>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Formulario de personaje
 // ---------------------------------------------------------------------------
 function CharacterFormModal({ title, initial, groups, fixedGroupId, onSave, onClose }) {
@@ -636,9 +702,9 @@ function GroupSection({ group, charsAll, search, mode, draggedId, setDraggedId, 
 // ---------------------------------------------------------------------------
 // Tarjeta de archivo (Home)
 // ---------------------------------------------------------------------------
-function FolderCard({ title, isFav, groupCount, charCount, onClick, onDelete, deletable }) {
+function FolderCard({ title, isFav, groupCount, charCount, image, onClick, onDelete, deletable }) {
   return (
-    <div onClick={onClick} className={`fc-folder p-4 cursor-pointer ${isFav ? 'is-fav' : ''}`} style={{ position: 'relative' }}>
+    <div onClick={onClick} className={`fc-folder p-4 ${isFav ? 'is-fav' : ''}`} style={{ position: 'relative', cursor: 'pointer' }}>
       {deletable && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
@@ -648,6 +714,9 @@ function FolderCard({ title, isFav, groupCount, charCount, onClick, onDelete, de
         >
           <Trash2 size={14} />
         </button>
+      )}
+      {image && !isFav && (
+        <img src={image} alt="" style={{ width: '100%', height: '6rem', objectFit: 'cover', borderRadius: '2px', marginBottom: '0.5rem', border: '1px solid rgba(32,40,58,0.1)' }} />
       )}
       <div className="flex items-center gap-2" style={{ marginBottom: '0.4rem' }}>
         {isFav && <Star size={15} color="#B98B3E" fill="#B98B3E" />}
@@ -684,6 +753,7 @@ function HomeView({ lists, characters, groups, favoritesExist, onOpenList, onAdd
             <FolderCard
               key={l.id}
               title={l.name}
+              image={l.image}
               groupCount={groups.filter((g) => g.listId === l.id).length}
               charCount={characters.filter((c) => c.listId === l.id).length}
               onClick={() => onOpenList(l.id)}
@@ -900,9 +970,9 @@ export default function FavCharApp() {
     setSortMode((prev) => ({ ...prev, [id]: mode }));
   }
 
-  function addList(name) {
+  function addList(name, image = null) {
     const id = genId('list');
-    setLists((ls) => [...ls, { id, name }]);
+    setLists((ls) => [...ls, { id, name, image }]);
     return id;
   }
   function renameList(id, name) {
@@ -1046,9 +1116,8 @@ export default function FavCharApp() {
       )}
 
       {modal?.type === 'addList' && (
-        <SimplePromptModal
-          title="Nuevo archivo" label="Nombre del archivo" placeholder="Ej: Blue Lock" confirmLabel="Crear archivo"
-          onSubmit={(val) => { const id = addList(val); openList(id); }}
+        <AddListModal
+          onSave={(name, image) => { const id = addList(name, image); openList(id); closeModal(); }}
           onClose={closeModal}
         />
       )}
